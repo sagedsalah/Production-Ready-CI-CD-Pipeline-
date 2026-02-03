@@ -1,24 +1,28 @@
+# Use official Python image
 FROM python:3.12-slim
 
-# set work directory
+# Set working directory inside container
 WORKDIR /app
 
-# copy requirements first (better caching)
+# Set PYTHONPATH so Python sees the app module
+ENV PYTHONPATH=/app
+
+# Copy only requirements first for caching
 COPY app/requirements.txt .
 
-# install dependencies
+# Upgrade pip and install dependencies
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# copy application code
-COPY app ./app
+# Copy application code
+COPY app/ ./app
 
-# copy tests (IMPORTANT for CI)
-COPY tests ./tests
+# Copy tests
+COPY tests/ ./tests
 
-# expose port
+# Expose port for FastAPI
 EXPOSE 8000
 
-# run app
+# Run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
